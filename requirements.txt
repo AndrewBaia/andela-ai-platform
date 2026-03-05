@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+llama-index
+llama-index-llms-openai
+llama-index-embeddings-openai
+pydantic
+pydantic-settings
+python-dotenv
+qdrant-client
+llama-index-vector-stores-qdrant
+deepeval
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
+loguru
+streamlit
+requests
