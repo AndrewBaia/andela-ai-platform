@@ -11,8 +11,6 @@ from loguru import logger
 
 class RAGEngine:
     def __init__(self):
-        # Configure Global Settings to use OLLAMA (Local AI)
-        # Using a lighter model (3.2) to avoid "runner terminated" errors
         Settings.llm = Ollama(
             model=settings.OLLAMA_MODEL, 
             base_url=settings.OLLAMA_BASE_URL, 
