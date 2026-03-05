@@ -6,8 +6,8 @@ import pytest
 import re
 import asyncio
 
-# Métrica Customizada e Resiliente (Andrew Baía - Technical Governance)
-# Esta métrica é otimizada para modelos locais (Ollama) e evita erros de parsing JSON complexos.
+# Custom Resilient Metric (Andrew Baía - Technical Governance)
+# This metric is optimized for local models (Ollama) and avoids complex JSON parsing errors.
 class LocalRAGFidelityMetric(BaseMetric):
     def __init__(self, threshold=0.5, model_name="llama3.1:8b"):
         self.threshold = threshold
@@ -17,22 +17,22 @@ class LocalRAGFidelityMetric(BaseMetric):
         self.success = False
 
     def measure(self, test_case: LLMTestCase):
-        """Mede a fidelidade da resposta ao contexto usando um prompt direto."""
+        """Measures response fidelity to context using a direct prompt."""
         prompt = f"""
-        Você é um avaliador de sistemas de IA. Sua tarefa é verificar se a RESPOSTA é fiel ao CONTEXTO fornecido.
+        You are an AI system evaluator. Your task is to verify if the RESPONSE is faithful to the provided CONTEXT.
         
-        CONTEXTO:
+        CONTEXT:
         {test_case.retrieval_context}
         
-        RESPOSTA:
+        RESPONSE:
         {test_case.actual_output}
         
-        Avalie a fidelidade e dê uma nota de 0 a 10.
-        Responda APENAS com o número da nota (ex: 8). Não escreva mais nada.
+        Evaluate the fidelity and give a score from 0 to 10.
+        Respond ONLY with the score number (e.g., 8). Do not write anything else.
         """
         try:
             response = str(self.model.complete(prompt)).strip()
-            # Extrai apenas o primeiro número encontrado na resposta
+            # Extract only the first number found in the response
             match = re.search(r"(\d+)", response)
             if match:
                 val = int(match.group(1))
@@ -40,7 +40,7 @@ class LocalRAGFidelityMetric(BaseMetric):
             else:
                 self.score = 0
         except Exception as e:
-            print(f"Erro na avaliação: {e}")
+            print(f"Evaluation error: {e}")
             self.score = 0
         
         self.success = self.score >= self.threshold
@@ -58,19 +58,19 @@ class LocalRAGFidelityMetric(BaseMetric):
 
 @pytest.mark.asyncio
 async def test_rag_performance():
-    """Avaliação de RAG otimizada para ambiente local (Anti-Alucinação)."""
+    """RAG evaluation optimized for local environment (Anti-Hallucination)."""
     
     query = "What are the key skills required for the AI Engineer role?"
     query_engine = rag_engine.get_query_engine()
     
-    # 1. Geração da Resposta
+    # 1. Response Generation
     response = query_engine.query(query)
     actual_output = str(response)
     
-    # 2. Recuperação do Contexto
+    # 2. Context Retrieval
     retrieval_context = [node.node.get_content() for node in response.source_nodes]
     
-    # 3. Avaliação com Métrica Customizada
+    # 3. Evaluation with Custom Metric
     metric = LocalRAGFidelityMetric(threshold=0.5, model_name="llama3.1:8b")
     test_case = LLMTestCase(
         input=query,
@@ -83,9 +83,9 @@ async def test_rag_performance():
     print(f"\n" + "="*30)
     print(f"📊 RAG EVALUATION REPORT")
     print(f"="*30)
-    print(f"Pergunta: {query}")
-    print(f"Score de Fidelidade: {score * 10}/10")
+    print(f"Query: {query}")
+    print(f"Fidelity Score: {score * 10}/10")
     print(f"Status: {'✅ PASS' if metric.is_successful() else '❌ FAIL'}")
     print(f"="*30 + "\n")
     
-    assert metric.is_successful(), f"Fidelidade insuficiente: {score*10}/10"
+    assert metric.is_successful(), f"Insufficient fidelity: {score*10}/10"

@@ -16,7 +16,7 @@ class RAGEngine:
         Settings.llm = Ollama(
             model=settings.OLLAMA_MODEL, 
             base_url=settings.OLLAMA_BASE_URL, 
-            request_timeout=300.0  # Aumentado para 5 minutos
+            request_timeout=300.0  # Increased to 5 minutes
         )
         Settings.embed_model = OllamaEmbedding(
             model_name=settings.OLLAMA_EMBED_MODEL,
